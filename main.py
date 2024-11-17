@@ -35,16 +35,16 @@ def execute_test(test_url: str) -> dict:
 def callback(channel: BlockingChannel, method, properties, body):
     global INDICATORS_DICT
     request_received = json.loads(body)
-    indicator_list = list(INDICATORS_DICT.keys())
+    instance_id: str or None = request_received['instanceId'] if 'instanceId' in request_received else None
 
     test_url: str or None = request_received['uri'] if 'uri' in request_received else None
     if test_url is None:
-        error_info = f"Error calling indicator id: {indicator_id}. Not exists"
+        error_info = f"Error calling test url: {test_url}. Not exists"
         error(error_info)
         raise EnvironmentError(error_info)
 
     response_message = {
-        'instanceUri': test_url,
+        'instanceUri': instance_id,
         'result': {}
     }
 
