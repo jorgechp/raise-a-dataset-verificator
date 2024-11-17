@@ -59,7 +59,7 @@ def callback(channel: BlockingChannel, method, properties, body):
         response_message['result'][key].append({
             'indicatorId': response_processed_key,
             'commentValue': response_processed_value['comment'],
-            'idValid': response_processed_value['result']
+            'isValid': response_processed_value['result']
         })
 
     if len(response_message['result']) > 0:
