@@ -9,8 +9,8 @@ from pika.adapters.blocking_connection import BlockingChannel
 from faircheck import process_response
 from logging import error
 
-VERIFICATION_QUEUE_NAME = 'verificationQueue'
-RESPONSE_QUEUE_NAME = 'responseQueue'
+VERIFICATION_QUEUE_NAME = 'RaiseDatasetVerificationQueue'
+RESPONSE_QUEUE_NAME = 'RaiseDatasetResponseQueue'
 
 INDICATORS_DICT = None
 
@@ -57,9 +57,9 @@ def callback(channel: BlockingChannel, method, properties, body):
             response_message['result'][key] = []
 
         response_message['result'][key].append({
-            'indicator_id': response_processed_key,
-            'comment_value': response_processed_value['comment'],
-            'is_valid': response_processed_value['result']
+            'indicatorId': response_processed_key,
+            'commentValue': response_processed_value['comment'],
+            'idValid': response_processed_value['result']
         })
 
     if len(response_message['result']) > 0:
