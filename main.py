@@ -3,7 +3,7 @@ from typing import List, Dict, Tuple
 
 import pika
 import json
-import requests  # Importar requests para hacer peticiones HTTP
+import requests  # Import requests to make HTTP requests
 from pika.adapters.blocking_connection import BlockingChannel
 
 from faircheck import process_response
@@ -18,7 +18,18 @@ FAIR_ENOUGH_ENDPOINT = 'https://api.fair-enough.semanticscience.org/evaluations'
 
 
 def execute_test(test_url: str) -> dict:
-    """Ejecuta la prueba contra el nuevo endpoint"""
+    """
+    Executes a test by sending a POST request to the FAIR Enough API.
+
+    Parameters:
+    test_url (str): The URL of the dataset to be tested.
+
+    Returns:
+    dict: The response from the API containing the test results.
+
+    Raises:
+    EnvironmentError: If the API call fails.
+    """
     body = {
         "subject": test_url,
         "collection": "fair-enough-data"
@@ -27,12 +38,21 @@ def execute_test(test_url: str) -> dict:
     if response.status_code in [200, 201]:
         return response.json()['contains']
     else:
-        error_info = f"Error calling  uri: {test_url} Status code: {response.status_code}"
+        error_info = f"Error calling uri: {test_url}. Status code: {response.status_code}"
         error(error_info)
         raise EnvironmentError(error_info)
 
 
 def callback(channel: BlockingChannel, method, properties, body):
+    """
+    Callback function to process messages from the verification queue.
+
+    Parameters:
+    channel (BlockingChannel): The channel object.
+    method: Method frame.
+    properties: Properties of the message.
+    body: The message body containing the test request.
+    """
     global INDICATORS_DICT
     request_received = json.loads(body)
     instance_id: str or None = request_received['instanceId'] if 'instanceId' in request_received else None
@@ -44,7 +64,7 @@ def callback(channel: BlockingChannel, method, properties, body):
         raise EnvironmentError(error_info)
 
     response_message = {
-        'instanceUri': instance_id,
+        'instanceId': instance_id,
         'result': {}
     }
 
@@ -69,6 +89,9 @@ def callback(channel: BlockingChannel, method, properties, body):
 
 
 def main():
+    """
+    Main function to set up the RabbitMQ connection and start consuming messages.
+    """
     global INDICATORS_DICT
     with open('tests_relations.json') as f:
         INDICATORS_DICT = json.load(f)
