@@ -31,7 +31,7 @@ def execute_test(test_url: str) -> dict:
     EnvironmentError: If the API call fails.
     """
     body = {
-        "subject": test_url,
+        "subject": "https://doi.org/" + test_url,
         "collection": "fair-enough-data"
     }
     response = requests.post(FAIR_ENOUGH_ENDPOINT, json=body)
@@ -57,11 +57,11 @@ def callback(channel: BlockingChannel, method, properties, body):
     request_received = json.loads(body)
     instance_id: str or None = request_received['instanceId'] if 'instanceId' in request_received else None
 
-    test_url: str or None = request_received['uri'] if 'uri' in request_received else None
+    test_url: str or None = request_received['uniqueIdentifier'] if 'uniqueIdentifier' in request_received else None
     if test_url is None:
         error_info = f"Error calling test url: {test_url}. Not exists"
         error(error_info)
-        raise EnvironmentError(error_info)
+        return
 
     response_message = {
         'instanceId': instance_id,
