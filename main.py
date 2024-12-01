@@ -31,7 +31,7 @@ def execute_test(test_url: str) -> dict:
     EnvironmentError: If the API call fails.
     """
     body = {
-        "subject": "https://doi.org/" + test_url,
+        "subject": test_url,
         "collection": "fair-enough-data"
     }
     response = requests.post(FAIR_ENOUGH_ENDPOINT, json=body)
