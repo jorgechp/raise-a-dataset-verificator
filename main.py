@@ -1,9 +1,7 @@
-from numbers import Number
-from typing import List, Dict, Tuple
-
 import pika
 import json
-import requests  # Import requests to make HTTP requests
+import requests
+import configparser
 from pika.adapters.blocking_connection import BlockingChannel
 
 from faircheck import process_response
@@ -96,7 +94,11 @@ def main():
     with open('tests_relations.json') as f:
         INDICATORS_DICT = json.load(f)
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=config.get('HOST', 'RABBIT_MQ_HOST'),
+                                                                   port=config.get('HOST', 'RABBIT_MQ_PORT')))
     channel = connection.channel()
 
     channel.queue_declare(queue=VERIFICATION_QUEUE_NAME, durable=True)
